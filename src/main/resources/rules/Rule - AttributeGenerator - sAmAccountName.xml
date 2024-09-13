@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Rule name="Rule - AttributeGenerator - sAmAccountName" type="AttributeGenerator">
+ <Description></Description>
+ <Source><![CDATA[
+
+
+
+String sAmAccountName;
+//String displayName;
+//String userPrincipalName;
+String firstName;
+String lastname;
+//String email;
+//String middleName;
+
+/*If (null != plan){
+	Identity identity = plan.getIdentity();
+
+
+    displayName = identity.getAttribute("name");
+
+    userPrincipalName = sAmAccoutName + "@domain.com";
+    firstName = identity.getAttribute("firstname");
+    lastname = identity.getAttribute("lastname");
+    middleName = identity.getAttribute("middlename");
+    sAmAccountName = getSamAccountName();
+   // email = getEmail();
+
+	List accountRequests = plan.getAccountRequests();
+	if (null != accountRequests) {
+		for (AccountRequest acctReq : accountRequests) {
+
+            //set the attributes on the Account Request with the updated values
+			acctReq.addArgument("sAmAccountName", sAmAccountName);
+            acctReq.addArgument("displayName", displayName);
+            acctReq.addArgument("userPrincipalName", userPrincipalName);
+            acctReq.addArgument("firstName", firstName);
+            acctReq.addArgument("lastName", lastName);
+
+		}
+	}
+}*/
+
+
+/*public String getEmail(){
+
+    String email = firstName+"."+LastName+"@dechert.com";
+    int counter = 0;
+        while(isEmailUnique(email)){
+
+            email = generateEmail(counter);
+        }
+
+    return email;
+
+}*/
+
+
+/*public String generateEmail(int counter){
+
+    if(middleName != null){
+
+        if(counter == 0){// this is the first time that there is a collision, so include the middle initial
+
+            email = firstName+"."+middleName.substring(0,1)+lastName+"@dechert.com";
+
+        } else{// if its not the first time that the uniqueness fails, then add counter at the end and check
+        //for uniqueness again
+
+
+            email = firstName+"."+middleName.substring(0,1)+lastName+counter+"@dechert.com";
+
+        }
+
+    } else{// the middle name does not exist, so, we just add the counter at the end of the email
+        email = firstName+"."+lastName+counter+"@dechert.com";
+
+    }
+
+    return email;
+
+}*/
+
+/*public boolean isEmailUnique(String email){
+
+    List sources = new ArrayList(Arrays.asList(new String[] {"Azure source ID"}));
+    String searchOp = "Equals";
+    boolean isEmailUnique = true;
+    List searchValues = new ArrayList(Arrays.asList(new String[] { email }));
+
+    // check attribute
+    if (idn.attrSearchCountAccounts(email, "extendedSearch_AD_email", searchOp, searchValues) > 0) {
+       isEmailUnique = false;
+    }
+    return isEmailUnique;
+
+}*/
+
+public String getSamAccountName(String firstName, String lastName){
+    String smaAccountName;
+
+    // check if the sAmAccountName already exists as an idenitty Attribute
+    // userID holds the sAmAccountName in case its a re-hire
+    if(identity.getAttribute("userID") !=null){
+
+        sAmAccountName = identity.getAttribute("userID");
+
+    } else {
+        // else generate a unique sAmAccountName
+
+        int i = 1;
+        int counter = 0;
+        sAmAccountName = firstName.charAt(0) + lastName;
+        while(isSamAccoutNameUnique(sAmAccountName)){
+            i++;
+            counter++;
+            sAmAccountName = generateSamAccountName(firstName, lastname, i, counter);
+
+
+        }
+
+    return sAmAccountName;
+
+
+    }
+
+
+
+}
+
+public String generateSamAccountName(String firstName, String lastName, int i, int counter){
+
+    String sAmAccountName;
+
+    if(firstName.length() < firstName.substring(0,i).length() ){
+
+         sAmAccountName = firstName.substring(0,i) + lastName + counter;
+
+    }
+    else{
+         sAmAccountName = firstName.substring(0,i) + lastName;
+    }
+
+    return sAmAccountName;
+}
+
+public boolean isSamAccoutNameUnique ( String sAmAccountName ) {
+
+	List sources = new ArrayList(Arrays.asList(new String[] {"AD source ID", "legacy AD source ID"}));
+    String searchOp = "Equals";
+    boolean isSamAccoutNameUnique = true;
+    List searchValues = new ArrayList(Arrays.asList(new String[] { sAmAccountName }));
+
+    // check attribute
+    if (idn.attrSearchCountAccounts(sources, "extendedSearch_AD_email", searchOp, searchValues) > 0) {
+       isSamAccoutNameUnique = false;
+    }
+    return isSamAccoutNameUnique;
+    }
+
+]]></Source>
+</Rule>
